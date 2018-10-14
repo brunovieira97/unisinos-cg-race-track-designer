@@ -153,6 +153,8 @@ void ScrollCallback(GLFWwindow* window, double offsetX, double offsetY) {
 }
 
 int main(int argc, char const *argv[]) {
+	std::string objFilename;
+
 	if (argc < 3) {
 		std::cout << "Please use -obj and inform OBJ file's path to continue." << std::endl;
 		
@@ -173,8 +175,7 @@ int main(int argc, char const *argv[]) {
 				}
 
 				i++;
-				
-				Read(argv[i]);
+				objFilename = argv[i];
 
 				break;
 			}
@@ -187,6 +188,7 @@ int main(int argc, char const *argv[]) {
 		}
 	}
 
-	return EXIT_SUCCESS;
-	
+	Read(objFilename);
+
+	return EXIT_SUCCESS;	
 }
