@@ -11,14 +11,17 @@ ArgTypeMap argTypeMap = {
 	{"-obj", ArgTypes::OBJ_FILE}
 };
 
-void Read();
-void DrawScene();
+void Read(std::string filename);
+void DrawScene(Mesh* mesh);
 
 void Read(std::string filename) {
-	OBJReader objReader = OBJReader(filename);
+	OBJReader* objReader = new OBJReader();
+	Mesh* mesh = objReader -> Read(filename);
+
+	DrawScene(mesh);
 }
 
-void DrawScene() {
+void DrawScene(Mesh* mesh) {
 
 }
 
