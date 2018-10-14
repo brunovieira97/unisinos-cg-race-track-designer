@@ -1,17 +1,17 @@
 #include <Classes/MTLReader.h>
 
-MTLReader::MTLReader(std::string filename) {
-	if (filename != "")
-		this -> Read(filename);
+MTLReader::MTLReader() {
 }
 
-void MTLReader::Read(std::string filename) {
+std::vector<Material*> MTLReader::Read(std::string filename) {
+	std::vector<Material*> materials;
+	
 	std::ifstream file;
 
 	file.open(filename);
 
 	if (!file.is_open()) {
-		std::cerr << "Unable to open " + filename + " file!" << std::endl;
+		std::cerr << "Unable to open " + filename + ". Application will terminate." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -31,38 +31,58 @@ void MTLReader::Read(std::string filename) {
 
 		switch(typeToken) {
 			case NEW_MATERIAL: {
-				std::cout << "New material found at line " + std::to_string(lineCount) + "." << std::endl;
+				std::cout << "[MTL] New material found at line " + std::to_string(lineCount) + "." << std::endl;
 				
+				std::string materialName;
+				lineStream >> materialName;
+
+				Material* material = new Material(materialName);
+
+				this -> materials.push_back(material);
+
+				this -> currentMaterialIndex = this -> materials.size() - 1;
+
 				break;
 			}
 
 			case MAP_KD: {
-				std::cout << "Map KD found at line " + std::to_string(lineCount) + "." << std::endl;
+				std::cout << "[MTL] Map KD found at line " + std::to_string(lineCount) + "." << std::endl;
 				
+				std::string textureFilename;
+				lineStream >> textureFilename;
+
+				this -> materials[currentMaterialIndex] -> SetTextureFilename(textureFilename);
+
 				break;
 			}
 
-			case KA: {
-				std::cout << "KA found at line " + std::to_string(lineCount) + "." << std::endl;
+			case KA: case KS: case KD: {
+				std::cout << "[MTL] KA found at line " + std::to_string(lineCount) + "." << std::endl;
 				
-				break;
-			}
+				float red, green, blue;
+				lineStream >> red >> green >> blue;
 
-			case KS: {
-				std::cout << "KS found at line " + std::to_string(lineCount) + "." << std::endl;
-				
-				break;
-			}
+				if (token == "Ka")
+					this -> materials[currentMaterialIndex] -> SetKA(red, green, blue);
+				else if (token == "Ks")
+					this -> materials[currentMaterialIndex] -> SetKS(red, green, blue);
+				else
+					this -> materials[currentMaterialIndex] -> SetKD(red, green, blue);
 
-			case KD: {
-				std::cout << "KD found at line " + std::to_string(lineCount) + "." << std::endl;
-				
 				break;
 			}
 
 			case NS: {
-				std::cout << "NS found at line " + std::to_string(lineCount) + "." << std::endl;
+				std::cout << "[MTL] NS found at line " + std::to_string(lineCount) + "." << std::endl;
 				
+				float ns;
+				lineStream >> ns;
+
+				if (ns < 0)
+					ns = ns* - 1;
+				
+				this -> materials[currentMaterialIndex] -> SetNS(ns);
+
 				break;
 			}
 
@@ -70,8 +90,9 @@ void MTLReader::Read(std::string filename) {
 				// Do nothing here
 				break;
 			}
-
 		}
 	}
+	
+	return this -> materials;
 
 }

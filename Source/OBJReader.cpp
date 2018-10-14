@@ -116,11 +116,21 @@ Mesh* OBJReader::Read(std::string filename) {
 			case MATERIAL_LIBRARY: {
 				std::cout << "Material library found at line " + std::to_string(lineCount) + "." << std::endl;
 
+				std::string materialLibraryFilename;
+				lineStream >> materialLibraryFilename;
+
+				this -> mesh -> SetMaterialLibraryFilename(materialLibraryFilename);
+
 				break;
 			}
 
 			case USE_MATERIAL: {
 				std::cout << "Material usage found at line " + std::to_string(lineCount) + "." << std::endl;
+
+				std::string materialID;
+				lineStream >> materialID;
+
+				this -> mesh -> SetActiveGroupMaterial(materialID);
 
 				break;
 			}

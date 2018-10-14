@@ -81,3 +81,14 @@ void Mesh::AddFaceToActiveGroup(std::vector<int> vertices, std::vector<int> norm
 	this -> groups.at(GetActiveGroupIndex()) -> AddFace(vertices, normals, textures);
 }
 
+void Mesh::SetMaterialLibraryFilename(std::string materialLibraryFilename) {
+	this -> materialLibraryFilename = materialLibraryFilename;
+}
+
+std::string Mesh::GetMaterialLibraryFilename() {
+	return this -> materialLibraryFilename;
+}
+
+void Mesh::SetActiveGroupMaterial(std::string materialID) {
+	this -> GetGroup(GetActiveGroupIndex()) -> SetMaterial(materialID);
+}

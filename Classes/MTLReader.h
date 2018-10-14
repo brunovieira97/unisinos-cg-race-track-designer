@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <Classes/Material.h>
 
 class MTLReader {
 	enum MTLTypes {
@@ -27,9 +28,11 @@ class MTLReader {
 	};
 
 	private:
-		int lineCount;
-		void Read(std::string filename);
+		int lineCount, currentMaterialIndex;
+		std::vector<Material*> materials;
 	
 	public:
-		MTLReader(std::string filename);
+		MTLReader();
+		
+		std::vector<Material*> Read(std::string filename);
 };
