@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <Classes/Mesh.h>
 
 class OBJReader {
 	enum OBJTypes {
@@ -30,8 +31,10 @@ class OBJReader {
 
 	private:
 		int lineCount;
-		void Read(std::string filename);
+		Mesh* mesh;
 	
 	public:
-		OBJReader(std::string filename);
+		OBJReader();
+
+		Mesh* Read(std::string filename);
 };

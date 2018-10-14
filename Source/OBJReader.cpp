@@ -1,17 +1,16 @@
 #include <Classes/OBJReader.h>
 
-OBJReader::OBJReader(std::string filename) {
-	if (filename != "")
-		this -> Read(filename);
+OBJReader::OBJReader() {
+	this -> mesh = new Mesh();
 }
 
-void OBJReader::Read(std::string filename) {
+Mesh* OBJReader::Read(std::string filename) {
 	std::ifstream file;
 
 	file.open(filename);
 
 	if(!file.is_open()) {
-		std::cerr << "Unable to open " + filename + " file!" << std::endl;
+		std::cerr << "Unable to open " + filename + ". Application will terminate." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -33,11 +32,21 @@ void OBJReader::Read(std::string filename) {
 			case VERTEX: {
 				std::cout << "Vertex found at line " + std::to_string(lineCount) + "." << std::endl;
 
+				float x, y, z;
+				lineStream >> x >> y >> z;
+
+				this -> mesh -> AddVertex(x, y, z);
+
 				break;
 			}
 
 			case VERTEX_NORMAL: {
 				std::cout << "Vertex normal found at line " + std::to_string(lineCount) + "." << std::endl;
+
+				float x, y, z;
+				lineStream >> x >> y >> z;
+
+				this -> mesh -> AddNormal(x, y, z);
 
 				break;
 			}
@@ -45,17 +54,61 @@ void OBJReader::Read(std::string filename) {
 			case VERTEX_TEXTURE: {
 				std::cout << "Vertex texture found at line " + std::to_string(lineCount) + "." << std::endl;
 
+				float x, y;
+				lineStream >> x >> y;
+
+				this -> mesh -> AddMapping(x, y);
+
 				break;
 			}
 
 			case FACE: {
 				std::cout << "Face found at line " + std::to_string(lineCount) + "." << std::endl;
 
+				std::vector<int> vertices, normals, textures;
+
+				while (lineStream.rdbuf() -> in_avail()) {
+					std::string faceToken, v, n, t;
+					lineStream >> faceToken;
+
+					if (faceToken == "")
+						break;
+					
+					std::stringstream faceStream(faceToken);
+
+					std::getline(faceStream, v, '/');
+					std::getline(faceStream, n, '/');
+					std::getline(faceStream, t, '/');
+
+					if (vertices.size() == 3) {
+						this -> mesh -> AddFaceToActiveGroup(vertices, normals, textures);
+						vertices[1] = stoi(v) - 1;
+						normals[1]	= stoi(n) - 1;
+						textures[1] = stoi(t) - 1;
+					} else {
+						vertices.push_back(stoi(v) - 1);
+						normals.push_back (stoi(n) - 1);
+						textures.push_back(stoi(t) - 1);
+					}
+				}
+
+				this -> mesh -> AddFaceToActiveGroup(vertices, normals, textures);
+
 				break;
 			}
 
 			case GROUP: {
 				std::cout << "Group found at line " + std::to_string(lineCount) + "." << std::endl;
+
+				std::string groupName;
+				lineStream >> groupName;
+
+				if (groupName == "")
+					groupName = "defaultGroup";
+
+				if (!mesh -> GroupExists(groupName)) {
+					mesh -> AddGroup(groupName);
+				}
 
 				break;
 			}
@@ -77,6 +130,7 @@ void OBJReader::Read(std::string filename) {
 				break;
 			}
 		}
-
 	}
+	
+	return this -> mesh;
 }
