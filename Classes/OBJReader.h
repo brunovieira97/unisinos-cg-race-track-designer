@@ -1,3 +1,6 @@
+#ifndef OBJREADER_H
+#define OBJREADER_H
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -38,3 +41,5 @@ class OBJReader {
 
 		Mesh* Read(std::string filename);
 };
+
+#endif

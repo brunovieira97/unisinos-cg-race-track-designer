@@ -1,5 +1,5 @@
-#ifndef FACE
-#define FACE
+#ifndef FACE_H
+#define FACE_H
 
 #include <vector>
 

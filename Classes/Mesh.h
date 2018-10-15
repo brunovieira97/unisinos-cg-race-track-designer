@@ -1,5 +1,5 @@
-#ifndef MESH
-#define MESH
+#ifndef MESH_H
+#define MESH_H
 
 #include <GLM/gtc/type_ptr.hpp>
 #include <Classes/Group.h>

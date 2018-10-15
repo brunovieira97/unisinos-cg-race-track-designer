@@ -1,5 +1,5 @@
-#ifndef MTLREADER
-#define MTLREADER
+#ifndef MTLREADER_H
+#define MTLREADER_H
 
 #include <string>
 #include <iostream>

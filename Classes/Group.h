@@ -1,5 +1,5 @@
-#ifndef GROUP
-#define GROUP
+#ifndef GROUP_H
+#define GROUP_H
 
 #include <string>
 #include <Classes/Face.h>
