@@ -1,3 +1,6 @@
+#ifndef GROUP
+#define GROUP
+
 #include <string>
 #include <Classes/Face.h>
 
@@ -22,3 +25,5 @@ class Group {
 		std::vector<Face*> GetFaces();
 		Face* GetFace(int faceIndex);
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef MESH
+#define MESH
+
 #include <GLM/gtc/type_ptr.hpp>
 #include <Classes/Group.h>
 #include <Classes/Material.h>
@@ -44,3 +47,5 @@ class Mesh {
 
 		void SetActiveGroupMaterial(std::string materialID);
 };
+
+#endif

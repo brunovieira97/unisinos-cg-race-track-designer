@@ -1,3 +1,6 @@
+#ifndef MATERIAL
+#define MATERIAL
+
 #include <string>
 #include <vector>
 #include <GL/glew.h>
@@ -32,3 +35,5 @@ class Material {
 		void SetNS(float ns);
 		float GetNS();
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef FACE
+#define FACE
+
 #include <vector>
 
 class Face {
@@ -16,3 +19,5 @@ class Face {
 		std::vector<int> GetNormals();
 		std::vector<int> GetTextures();
 };
+
+#endif

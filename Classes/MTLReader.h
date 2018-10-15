@@ -1,3 +1,6 @@
+#ifndef MTLREADER
+#define MTLREADER
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -36,3 +39,5 @@ class MTLReader {
 		
 		std::vector<Material*> Read(std::string filename);
 };
+
+#endif
