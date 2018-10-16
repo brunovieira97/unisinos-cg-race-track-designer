@@ -6,6 +6,14 @@ MinGW's G++ specific libraries were compiled and used on this project. In order 
 	
 	g++ -Wall ./Source/*.cpp -I. -g -lglew32 -lglfw3 -lsoil2 -lopengl32 -lglu32 -lgdi32
 
+
+After building the .exe, call it by using the following command syntax:
+
+	a.exe -obj <OBJ file name>
+
+
+Since the OBJ file may contain MTL file(s) reference(s), it is preferrable to keep all scene files on the application's root directory.
+
 ## Made with
 * C++
 * OpenGL
