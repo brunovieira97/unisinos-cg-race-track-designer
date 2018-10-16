@@ -77,8 +77,8 @@ Mesh* OBJReader::Read(std::string filename) {
 					std::stringstream faceStream(faceToken);
 
 					std::getline(faceStream, v, '/');
-					std::getline(faceStream, n, '/');
 					std::getline(faceStream, t, '/');
+					std::getline(faceStream, n, '/');
 
 					if (vertices.size() == 3) {
 						this -> mesh -> AddFaceToActiveGroup(vertices, normals, textures);
