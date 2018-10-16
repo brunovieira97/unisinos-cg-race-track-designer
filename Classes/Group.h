@@ -8,6 +8,7 @@ class Group {
 	private:
 		std::vector<Face*> faces;
 		std::string name, material;
+		int vaoIndex, textureIndex;
 
 	public:
 		Group();
@@ -18,9 +19,13 @@ class Group {
 
 		void SetName(std::string name);
 		void SetMaterial(std::string material);
+		void SetVAOIndex(int vaoIndex);
+		void SetTextureIndex(int textureIndex);
 
 		std::string GetName();
 		std::string GetMaterial();
+		int GetVAOIndex();
+		int GetTextureIndex();
 		
 		std::vector<Face*> GetFaces();
 		Face* GetFace(int faceIndex);

@@ -40,3 +40,19 @@ std::vector<Face*> Group::GetFaces() {
 Face* Group::GetFace(int faceIndex) {
 	return this -> faces.at(faceIndex);
 }
+
+void Group::SetVAOIndex(int vaoIndex) {
+	this -> vaoIndex = vaoIndex;
+}
+
+int Group::GetVAOIndex() {
+	return this -> vaoIndex;
+}
+
+void Group::SetTextureIndex(int textureIndex) {
+	this -> textureIndex = textureIndex;
+}
+
+int Group::GetTextureIndex() {
+	return this -> textureIndex;
+}
