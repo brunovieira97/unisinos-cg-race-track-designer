@@ -4,12 +4,14 @@
 #include <vector>
 #include <iostream>
 #include <Classes/Shader.h>
+#include <GLM/gtc/matrix_transform.hpp>
+#include <GLM/gtc/type_ptr.hpp>
 
 using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void MouseCallback(GLFWwindow* window, int button, int action, int mods);
 std::vector<GLfloat>* convertToFloat(std::vector<glm::vec3*>* points);
 void convertCoordinates(double &x, double &y);
 
@@ -19,6 +21,8 @@ vector<GLfloat>* finalPointsFloat = new vector<GLfloat>();
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+glm::mat4 projection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -1.0f, 1.0f);
 
 GLuint vao, vbo;
 
@@ -59,7 +63,7 @@ std::vector<GLfloat>* convertToFloat(std::vector<glm::vec3*>* points) {
 	return temp;
 }
 
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
@@ -70,42 +74,8 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		cout << "ponto registrado" << endl;
 		cout << "x = " << xpos << endl;
 		cout << "y = " << ypos << endl;
-		
 
-	// 	int zone = getZone(xpos, ypos);
-	// 	if (zone == 1) {
-	// 		xpos += 0.5;
-	// 		ypos += 0.5;
-	// 	}
-	// 	else if (zone == 2) {
-	// 		xpos -= 0.5;
-	// 		ypos += 0.5;
-	// 	}
-	// 	else if (zone == 3) {
-	// 		xpos -= 0.5;
-	// 		ypos -= 0.5;
-	// 	}
-	// 	else if (zone == 4) {
-	// 		xpos += 0.5;
-	// 		ypos -= 0.5;
-	// 	}
-	// }	
-	// if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-	// 	draw = true;
-
-	// 	originalCurve = generateCurve(selectedPoints);
-	// 	externalCurve = generateExternalCurve(originalCurve, true);
-	// 	internalCurve = generateExternalCurve(originalCurve, false);
-
-	// 	externalCurveSize = externalCurve->size() / 2.0;
-	// 	internalCurveSize = internalCurve->size() / 2.0;
-		
-	// 	OBJWriter OBJWriter;
-	// 	OBJWriter.saveTextureValuesToOBJ();
-
-	// 	finalPoints = generateFinalCurve(internalCurve, externalCurve);
-
-		finalPointsFloat = convertToFloat(selectedPoints);
+		finalPointsFloat = convertToFloat(selectedPoints);		
 
 		glGenBuffers(1, &vbo);
 	
@@ -113,9 +83,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*finalPointsFloat->size(), &finalPointsFloat->at(0), GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	 }
 }
 
@@ -141,7 +111,8 @@ int main(){
         return -1;
     }
     glfwMakeContextCurrent(window);
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+	glfwSetMouseButtonCallback(window, MouseCallback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // glad: load all OpenGL function pointers
@@ -178,8 +149,8 @@ int main(){
 		glEnable(GL_POINT_SMOOTH);
 		glPointSize(15);
 		glDrawArrays(GL_POINTS, 0, finalPointsFloat->size());
+		//shader.setMat4("projection", projection);
 		glDisable(GL_POINT_SMOOTH);
-
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
