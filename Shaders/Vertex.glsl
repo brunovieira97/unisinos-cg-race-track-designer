@@ -1,7 +1,10 @@
 #version 410
 
-in vec4 position;
+layout (location = 0) in vec3 v;
 
- void main() {
- 	gl_Position = position;
- }
+uniform mat4 projection;
+
+void main()
+{
+    gl_Position = projection * vec4(v.x, v.y, v.z, 1.0);
+};
