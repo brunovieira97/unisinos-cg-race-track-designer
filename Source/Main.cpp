@@ -48,13 +48,13 @@ void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*finalPointsFloat.size(), finalPointsFloat.data(), GL_STATIC_DRAW);		
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*finalPointsFloat.size(), &finalPointsFloat[0], GL_STATIC_DRAW);		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		// int size = finalPointsFloat.size();
-		// for(int i = 0; i < size; i++){
-		// 	printf("%f\n",finalPointsFloat[i]);
-		// }
+		int size = finalPointsFloat.size();
+		for(int i = 0; i < size; i++){
+			printf("%f\n",finalPointsFloat[i]);
+		}
 
 		click++;
 	 }
@@ -123,7 +123,7 @@ int main(){
 		glPointSize(15);
 		shader.setMat4("projection", projection);
 		//glDrawArrays(GL_POINTS, 0, finalPointsFloat.size());
-		glDrawArrays(GL_LINE_STRIP, 0, finalPointsFloat.size());
+		glDrawArrays(GL_LINE_STRIP, 0, finalPointsFloat.size() / 3);
 		glDisable(GL_POINT_SMOOTH);
         glfwSwapBuffers(window);
         glfwPollEvents();
