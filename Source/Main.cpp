@@ -50,7 +50,7 @@ void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 
 		controlPointsFloat.push_back(xpos);
 		controlPointsFloat.push_back(ypos);
-		//controlPointsFloat.push_back(0.0);
+		controlPointsFloat.push_back(0.0);
 		cout << "ponto registrado" << endl;
 		cout << "x = " << xpos << endl;
 		cout << "y = " << ypos << endl;		
@@ -59,7 +59,7 @@ void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 		glBindBuffer(GL_ARRAY_BUFFER, vboC);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*controlPointsFloat.size(), controlPointsFloat.data(), GL_STATIC_DRAW);		
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);		
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);		
 
 		if(controlPointsFloat.size() > 9){
 
@@ -68,7 +68,7 @@ void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 			glBindBuffer(GL_ARRAY_BUFFER, vboB);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float)*bSplineCurve.size(), bSplineCurve.data(), GL_STATIC_DRAW);		
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
 
 			internalCurveVec = CreateExternalCurve(controlPointsVec, false);	
@@ -83,7 +83,8 @@ void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 			glBindBuffer(GL_ARRAY_BUFFER, vboI);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float)*internalCurve.size(), internalCurve.data(), GL_STATIC_DRAW);		
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);			 
+	
 
 			externalCurveVec = CreateExternalCurve(controlPointsVec, true);	
 			externalCurve.clear();
@@ -97,7 +98,7 @@ void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 			glBindBuffer(GL_ARRAY_BUFFER, vboE);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(float)*externalCurve.size(), externalCurve.data(), GL_STATIC_DRAW);		
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 		}
 
 	 }
@@ -155,7 +156,7 @@ int main(){
 	glBindVertexArray(vaoB);
 	glGenBuffers(1, &vboB);
 
-			Shader shader("Shaders/Vertex.glsl", "Shaders/Fragment.glsl");
+	Shader shader("Shaders/Vertex.glsl", "Shaders/Fragment.glsl");
 		
 		
 
@@ -198,17 +199,36 @@ int main(){
 
 void draw(){
 
-	glBindVertexArray(vaoC);
-	glDrawArrays(GL_POINTS, 0, controlPointsFloat.size() / 2);
 
-	glBindVertexArray(vaoE);
-	glDrawArrays(GL_LINE_STRIP, 0, externalCurve.size() / 3);
+		glBindVertexArray(vaoC);
+		glBindBuffer(GL_ARRAY_BUFFER, vboC);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*controlPointsFloat.size(), controlPointsFloat.data(), GL_STATIC_DRAW);		
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);	
+		glDrawArrays(GL_POINTS, 0, controlPointsFloat.size() / 3);
 
-	glBindVertexArray(vaoI);
-	glDrawArrays(GL_LINE_STRIP, 0, internalCurve.size() / 3);
+		glBindVertexArray(vaoI);
+		glBindBuffer(GL_ARRAY_BUFFER, vboI);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*internalCurve.size(), internalCurve.data(), GL_STATIC_DRAW);		
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glDrawArrays(GL_LINE_STRIP, 0, internalCurve.size() / 3);
 	
-	glBindVertexArray(vaoB);
-	glDrawArrays(GL_LINE_STRIP, 0, bSplineCurve.size() / 2);
+		glBindVertexArray(vaoB);
+		glBindBuffer(GL_ARRAY_BUFFER, vboB);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*bSplineCurve.size(), bSplineCurve.data(), GL_STATIC_DRAW);		
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glBindVertexArray(vaoB);
+		glDrawArrays(GL_LINE_STRIP, 0, bSplineCurve.size() / 3);
+
+
+		glBindVertexArray(vaoE);
+		glBindBuffer(GL_ARRAY_BUFFER, vboE);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*externalCurve.size(), externalCurve.data(), GL_STATIC_DRAW);		
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+		glDrawArrays(GL_LINE_STRIP, 0, externalCurve.size() / 3);
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -265,7 +285,7 @@ vector<glm::vec3*>* CreateBSpline(vector<glm::vec3*>* points) {
 			bspline->push_back(point);
 			bSplineCurve.push_back(x);
 			bSplineCurve.push_back(y);
-			// bSplineCurve.push_back(0);
+			bSplineCurve.push_back(0);
 
 			//bspline->push_back(new glm::vec3(1.0, 1.0, 1.0));
 		}	
@@ -306,8 +326,8 @@ vector<glm::vec3*>* CreateExternalCurve(vector<glm::vec3*>* points, bool externa
 			angle -= HALF_PI;
 		}
 
-		GLfloat cx = (glm::cos(angle) * 0.09);
-		GLfloat cy = (glm::sin(angle) * 0.09);
+		GLfloat cx = (glm::cos(angle) * 30);
+		GLfloat cy = (glm::sin(angle) * 30);
 		
 		glm::vec3* pointGenerated = new glm::vec3(a->x + cx, a->y + cy, 0.0);
 		calculatedCurve->push_back(pointGenerated);
