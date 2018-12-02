@@ -416,5 +416,10 @@ vector<glm::vec3*>* CreateExternalCurve(vector<glm::vec3*>* points, bool externa
 		calculatedCurve->push_back(pointGenerated);
 
 	}
+
+	calculatedCurve->push_back(calculatedCurve->at(0));
+	calculatedCurve->push_back(calculatedCurve->at(1));
+	calculatedCurve->push_back(calculatedCurve->at(2));
+
 	return calculatedCurve;
 }
