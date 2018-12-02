@@ -18,27 +18,79 @@ void MouseCallback(GLFWwindow* window, int button, int action, int mods);
 vector<glm::vec3*>* CreateBSpline(vector<glm::vec3*>* points);
 vector<glm::vec3*>* CreateExternalCurve(vector<glm::vec3*>* points, bool external);
 void draw();
+float EuclideanDistance(float xa, float ya, float xb, float yb);
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void FillControlPointsFloat(vector<glm::vec3*>* points);
 
 vector<float> controlPointsFloat;
 vector<float> internalCurve;
 vector<float> externalCurve;
 vector<float> bSplineCurve;
+vector<float> colors;
 vector<glm::vec3*>* selectedPoints = new vector<glm::vec3*>();
 vector<glm::vec3*>* controlPointsVec = new vector<glm::vec3*>();
 vector<glm::vec3*>* externalCurveVec = new vector<glm::vec3*>();
 vector<glm::vec3*>* internalCurveVec = new vector<glm::vec3*>();
 
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+int selectedIndex;
+
+
 
 glm::mat4 projection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -1.0f, 1.0f);
 
-GLuint vaoC, vboC;
+GLuint vaoC, vboC, vboColors;
 GLuint vaoI, vboI;
 GLuint vaoE, vboE;
 GLuint vaoB, vboB;
+
+
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+
+    if (key == GLFW_KEY_PAGE_UP && action == GLFW_PRESS){		
+		float z = selectedPoints->at(selectedIndex)->z;
+		if (0.0f <= z && z < 1.0f){
+			z = z +  0.1f;
+			selectedPoints->at(selectedIndex)->z = z;
+		}		
+		cout << "controlPointsFloat size = " << controlPointsFloat.size() << endl;
+		controlPointsFloat.clear();
+		cout << "selectedPoints size = " << selectedPoints->size() << endl;
+		FillControlPointsFloat(selectedPoints);
+		cout << "controlPointsFloat size = " << controlPointsFloat.size() << endl;
+	}
+
+	if (key == GLFW_KEY_PAGE_DOWN && action == GLFW_PRESS){		
+		float z = selectedPoints->at(selectedIndex)->z;
+		if (0.0f < z && z <= 2.0f){
+			z = z - 0.1f;
+			if(z < 0)
+				z = 0.0;
+			selectedPoints->at(selectedIndex)->z = z;
+			cout << "z aumentou = " << z << endl;
+		}		
+		controlPointsFloat.clear();
+		cout << "selectedPoints size = " << selectedPoints->size() << endl;
+		FillControlPointsFloat(selectedPoints);
+	}
+	draw();
+}
+
+void FillControlPointsFloat(vector<glm::vec3*>* points){
+
+	for(int i = 0; i < points -> size(); i++)
+	{
+		controlPointsFloat.push_back(points->at(i)->x);
+		controlPointsFloat.push_back(points->at(i)->y);
+		controlPointsFloat.push_back(points->at(i)->z);
+	}
+
+}
 
 void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
@@ -50,7 +102,7 @@ void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 
 		controlPointsFloat.push_back(xpos);
 		controlPointsFloat.push_back(ypos);
-		controlPointsFloat.push_back(0.0);
+		controlPointsFloat.push_back(0.0f);
 		cout << "ponto registrado" << endl;
 		cout << "x = " << xpos << endl;
 		cout << "y = " << ypos << endl;		
@@ -58,8 +110,8 @@ void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 		glBindVertexArray(vaoC);
 		glBindBuffer(GL_ARRAY_BUFFER, vboC);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*controlPointsFloat.size(), controlPointsFloat.data(), GL_STATIC_DRAW);		
-		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);		
+		glEnableVertexAttribArray(0);
 
 		if(controlPointsFloat.size() > 9){
 
@@ -101,8 +153,31 @@ void MouseCallback(GLFWwindow* window, int button, int action, int mods) {
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 		}
 
-	 }
+	}
+
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		int nearestIndex = 0;
+		float nearestIndexDistance = EuclideanDistance(xpos, ypos, selectedPoints->at(0)->x, selectedPoints->at(0)->y);
+		for(int i = 1; i < selectedPoints->size(); i++){
+			float distance = EuclideanDistance(xpos, ypos, selectedPoints->at(i)->x, selectedPoints->at(i)->y);
+			if(distance < nearestIndexDistance){
+				nearestIndex = i;
+				nearestIndexDistance = distance;
+			}
+		}
+	
+		selectedIndex = nearestIndex;
+		cout << "selectedIndex " << selectedIndex << endl;			
+
+	}
 }
+
+float EuclideanDistance(float xa, float ya, float xb, float yb){
+	return sqrt(((xb - xa) * (xb - xa)) + ((yb - ya) * (yb - ya)));
+}
+
 
 int main(){
     // glfw: initialize and configure
@@ -125,6 +200,8 @@ int main(){
         glfwTerminate();
         return -1;
     }
+
+	glfwSetKeyCallback(window, KeyCallback);
     glfwMakeContextCurrent(window);
 	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 	glfwSetMouseButtonCallback(window, MouseCallback);
@@ -143,6 +220,7 @@ int main(){
 	glGenVertexArrays(1, &vaoC);
 	glBindVertexArray(vaoC);
 	glGenBuffers(1, &vboC);
+	glGenBuffers(1, &vboColors);
 
 	glGenVertexArrays(1, &vaoI);
 	glBindVertexArray(vaoI);
@@ -156,9 +234,13 @@ int main(){
 	glBindVertexArray(vaoB);
 	glGenBuffers(1, &vboB);
 
+
+	colors.push_back(0.5);
+	colors.push_back(0.5);
+	colors.push_back(0.5);	
+		
 	Shader shader("Shaders/Vertex.glsl", "Shaders/Fragment.glsl");
-		
-		
+	Shader shaderControlPoints("Shaders/VertexControlPoints.glsl", "Shaders/FragmentControlPoints.glsl");
 
     // render loop
     // -----------
@@ -177,7 +259,9 @@ int main(){
         // -------------------------------------------------------------------------------
 
 		shader.use();
+
 		shader.setMat4("projection", projection);
+		// shaderControlPoints.setMat4("projection", projection);
 		glEnable(GL_POINT_SMOOTH);
 		glPointSize(15);
 		// shader.setMat4("projection", projection);
@@ -199,12 +283,11 @@ int main(){
 
 void draw(){
 
-
 		glBindVertexArray(vaoC);
 		glBindBuffer(GL_ARRAY_BUFFER, vboC);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*controlPointsFloat.size(), controlPointsFloat.data(), GL_STATIC_DRAW);		
-		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);	
+		glEnableVertexAttribArray(0);
 		glDrawArrays(GL_POINTS, 0, controlPointsFloat.size() / 3);
 
 		glBindVertexArray(vaoI);
