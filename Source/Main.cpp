@@ -6,6 +6,8 @@
 #include <Classes/Shader.h>
 #include <GLM/gtc/matrix_transform.hpp>
 #include <GLM/gtc/type_ptr.hpp>
+#include <Classes/OBJWriter.h>
+#include <Classes/SplineWriter.h>
 
 using namespace std;
 
@@ -21,6 +23,7 @@ void draw();
 float EuclideanDistance(float xa, float ya, float xb, float yb);
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void FillControlPointsFloat(vector<glm::vec3*>* points);
+void WriteOBJFile();
 
 vector<float> controlPointsFloat;
 vector<float> internalCurve;
@@ -319,6 +322,9 @@ void draw(){
 void processInput(GLFWwindow *window){
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+	
+	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+		WriteOBJFile();
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -339,7 +345,7 @@ vector<glm::vec3*>* CreateBSpline(vector<glm::vec3*>* points) {
 
 	int size = points->size();
 	for (int i = 0; i < size ; i++) {
-		temp->push_back(new glm::vec3(points->at(i)->x, points->at(i)->y, 0));
+		temp->push_back(new glm::vec3(points->at(i)->x, points->at(i)->y, points->at(i)->z));
 	}
 
 
@@ -363,14 +369,17 @@ vector<glm::vec3*>* CreateBSpline(vector<glm::vec3*>* points) {
 				(3 * pow(t, 3) - 6 * pow(t, 2) + 0 * t + 4)*temp->at(i+1)->y +
 				(-3 * pow(t, 3) + 3 * pow(t, 2) + 3 * t + 1)*temp->at(i+2)->y +
 				(1 * pow(t, 3) + 0 * pow(t, 2) + 0 * t + 0)*temp->at(i+3)->y) / 6);
+			
+			GLfloat z = (((-1 * pow(t, 3) + 3 * pow(t, 2) - 3 * t + 1)*temp->at(i)->z +
+				(3 * pow(t, 3) - 6 * pow(t, 2) + 0 * t + 4)*temp->at(i+1)->z +
+				(-3 * pow(t, 3) + 3 * pow(t, 2) + 3 * t + 1)*temp->at(i+2)->z +
+				(1 * pow(t, 3) + 0 * pow(t, 2) + 0 * t + 0)*temp->at(i+3)->z) / 6);
 					
-			glm::vec3* point = new glm::vec3(x, y, 0.0);
+			glm::vec3* point = new glm::vec3(x, y, z);
 			bspline->push_back(point);
 			bSplineCurve.push_back(x);
 			bSplineCurve.push_back(y);
-			bSplineCurve.push_back(0);
-
-			//bspline->push_back(new glm::vec3(1.0, 1.0, 1.0));
+			bSplineCurve.push_back(z);
 		}	
 	}
 
@@ -412,7 +421,7 @@ vector<glm::vec3*>* CreateExternalCurve(vector<glm::vec3*>* points, bool externa
 		GLfloat cx = (glm::cos(angle) * 30);
 		GLfloat cy = (glm::sin(angle) * 30);
 		
-		glm::vec3* pointGenerated = new glm::vec3(a->x + cx, a->y + cy, 0.0);
+		glm::vec3* pointGenerated = new glm::vec3(a->x + cx, a->y + cy, points -> at(j) -> z);
 		calculatedCurve->push_back(pointGenerated);
 
 	}
@@ -422,4 +431,12 @@ vector<glm::vec3*>* CreateExternalCurve(vector<glm::vec3*>* points, bool externa
 	calculatedCurve->push_back(calculatedCurve->at(2));
 
 	return calculatedCurve;
+}
+
+void WriteOBJFile() {
+	OBJWriter *objWriter = new OBJWriter(&internalCurve, &externalCurve);
+	SplineWriter *splineWriter = new SplineWriter(&bSplineCurve);
+
+	objWriter -> WriteOBJ();
+	splineWriter -> WriteSpline();
 }
